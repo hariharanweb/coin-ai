@@ -1,4 +1,4 @@
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 import _ from 'lodash';
 import candleService from '../services/candleService';
 
@@ -9,27 +9,25 @@ const getMarketChanges = async () => {
 
     console.log('Checking alerts for Markets', investingMarkets);
     
-    const responses = investingMarkets.map(investingMarket => {
-        return candleService.fetchCandles(investingMarket).then(candles => {
-            const meanByParameter = 'close'
-            const tenPercent = Math.round(candles.length * 0.1);
-            const recentCandles = candles.slice(0, tenPercent);
-            const oldCandles = candles.slice(tenPercent);
-    
-            const recentMean = _.meanBy(recentCandles, meanByParameter)
-            const oldMean = _.meanBy(oldCandles, meanByParameter)
-    
-            const changePercent = (recentMean - oldMean) * 100 / oldMean;
-            const recentCandleValue = candles[0][meanByParameter]
-            const lastCandleDeviationPercent = (recentCandleValue - recentMean)*100/recentMean;
-            return {
-                marketPair: investingMarket,
-                recentMean,
-                oldMean,
-                changePercent,
-                lastCandleDeviationPercent
-            }
-        });
+    const responses = investingMarkets.map(async investingMarket => {
+        const candles = await candleService.fetchCandles(investingMarket);
+        const meanByParameter = 'close';
+        const tenPercent = Math.round(candles.length * 0.1);
+        const recentCandles = candles.slice(0, tenPercent);
+        const oldCandles = candles.slice(tenPercent);
+        const recentMean = _.meanBy(recentCandles, meanByParameter);
+        const oldMean = _.meanBy(oldCandles, meanByParameter);
+        const changePercent = (recentMean - oldMean) * 100 / oldMean;
+        const recentCandleValue = candles[0][meanByParameter];
+        const lastCandleDeviationPercent = (recentCandleValue - recentMean) * 100 / recentMean;
+        return {
+            marketPair: investingMarket,
+            recentMean,
+            oldMean,
+            changePercent,
+            recentCandleValue,
+            lastCandleDeviationPercent
+        };
     })
     return await Promise.all(responses).then(marketChanges=> {
         return _.sortBy(marketChanges, 'changePercent').reverse()
