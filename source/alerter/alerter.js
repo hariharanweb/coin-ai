@@ -1,16 +1,17 @@
 import dotenv from 'dotenv';
 import _ from 'lodash';
 import candleService from '../services/candleService';
+import marketDetails from '../services/marketDetails'
 
 dotenv.config();
 
 const getMarketChanges = async () => {
-    const investingMarkets = process.env.INVESTING_MARKETS.split(',');
+    const investingMarkets = marketDetails.filter(marketDetail =>
+        marketDetail.order_types.indexOf('market_order') >= 0 && marketDetail.base_currency_short_name === 'USDT'
+    );
 
-    console.log('Checking alerts for Markets', investingMarkets);
-    
     const responses = investingMarkets.map(async investingMarket => {
-        const candles = await candleService.fetchCandles(investingMarket);
+        const candles = await candleService.fetchCandles(investingMarket.pair);
         const meanByParameter = 'close';
         const tenPercent = Math.round(candles.length * 0.1);
         const recentCandles = candles.slice(0, tenPercent);
@@ -21,7 +22,8 @@ const getMarketChanges = async () => {
         const recentCandleValue = candles[0][meanByParameter];
         const lastCandleDeviationPercent = (recentCandleValue - recentMean) * 100 / recentMean;
         return {
-            marketPair: investingMarket,
+            marketPair: investingMarket.pair,
+            symbol: investingMarket.symbol,
             recentMean,
             oldMean,
             changePercent,
@@ -29,7 +31,7 @@ const getMarketChanges = async () => {
             lastCandleDeviationPercent
         };
     })
-    return await Promise.all(responses).then(marketChanges=> {
+    return await Promise.all(responses).then(marketChanges => {
         return _.sortBy(marketChanges, 'changePercent').reverse()
     });
 }
