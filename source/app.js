@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import orderService from './services/orderService';
 import candleService from './services/candleService';
+import telegramService from './services/telegramService';
 
 dotenv.config();
 const app = express()
@@ -31,6 +32,17 @@ app.post('/user/order', async (req, res) => {
     const lastClose = recentCandle[0].close;
     const order = await orderService.order(body.marketPair, lastClose, body.amount);
     res.send(order);
+})
+
+app.post('/telegram/message', async (req, res) => {
+    const response = await telegramService.postMessage(req.body.message);
+    res.send(response);
+})
+
+app.post('/telegram/alert', async (req, res) => {
+
+    const response = await telegramService.postMessage(req.body.message);
+    res.send(response);
 })
 
 app.listen(port, () => {
