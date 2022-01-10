@@ -43,12 +43,14 @@ const getMarketChanges = async () => {
 getMarketChanges().then(marketChanges => {
     console.log(marketChanges);
     var message = "Markets Now\n============\n"
-    message = message + marketChanges
-        .filter(marketChanges => marketChanges.changePercent > BULL_THRESHOLD_TO_NOTIFY)
-        .map(marketChange => `${marketChange.symbol} - ${marketChange.changePercent.toPrecision(2)}%\n`)
-        .join("")
-    console.log(message);
-    telegramService.postMessage(message);
+    const filtered = marketChanges.filter(marketChanges => marketChanges.changePercent > BULL_THRESHOLD_TO_NOTIFY && marketChanges.lastCandleDeviationPercent > -0.5);
+    if (filtered.length > 0) {
+        message = message +
+            filtered.map(marketChange => `${marketChange.symbol} - ${marketChange.changePercent.toPrecision(2)} - Trend - ${marketChange.lastCandleDeviationPercent} %\n`)
+                .join("")
+        console.log(message);
+        telegramService.postMessage(message);
+    }
 });
 
 

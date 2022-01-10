@@ -1,0 +1,1 @@
+npm run --prefix /Users/harihat/personal/coin-ai alerter 
