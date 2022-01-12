@@ -63,9 +63,10 @@ getMarketChanges().then(marketChanges => {
     );
     if (filtered.length > 0) {
         fileService.storeLastMarket(filtered);
-        var message = "Markets Now\n============\n"
+        var message = "<b>Markets Now\n</b>"
         message = message +
-            filtered.map(marketChange => `${marketChange.symbol} - ${marketChange.changePercent.toPrecision(2)} - Trend - ${marketChange.lastCandleDeviationPercent.toPrecision(2)} - ${marketChange.url}\n`)
+            filtered.map(marketChange => 
+                `<a href="${marketChange.url}">${marketChange.symbol}</a> - ${marketChange.changePercent.toPrecision(2)} - Trend - ${marketChange.lastCandleDeviationPercent.toPrecision(2)}\n`)
                 .join("")
         console.log(message);
         telegramService.postMessage(message);
