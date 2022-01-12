@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import _ from 'lodash';
 import candleService from '../services/candleService';
+import fileService from '../services/fileService';
 import marketDetails from '../services/marketDetails';
 import telegramService from '../services/telegramService';
 
@@ -30,7 +31,8 @@ const getMarketChanges = async () => {
             oldMean,
             changePercent,
             recentCandleValue,
-            lastCandleDeviationPercent
+            lastCandleDeviationPercent,
+            url: `https://coindcx.com/trade/${investingMarket.symbol}`
         };
     })
     return await Promise.all(responses).then(marketChanges => {
@@ -40,13 +42,30 @@ const getMarketChanges = async () => {
     });
 }
 
+const checkLastMarket = (marketChange, lastMarkets) => {
+    const lastMarket = lastMarkets[marketChange.symbol]
+    if (lastMarket) {
+        const changeFromLast = marketChange.changePercent - lastMarket.changePercent;
+        return changeFromLast > 0.5 || changeFromLast < -0.5;
+    }
+    else return true;
+}
+
 getMarketChanges().then(marketChanges => {
     console.log(marketChanges);
-    var message = "Markets Now\n============\n"
-    const filtered = marketChanges.filter(marketChanges => marketChanges.changePercent > BULL_THRESHOLD_TO_NOTIFY && marketChanges.lastCandleDeviationPercent > -0.5);
+    var lastMarkets = fileService.readLastMarket();
+    lastMarkets = _.keyBy(lastMarkets, lastMarket => lastMarket.symbol);
+
+    const filtered = marketChanges.filter(marketChange =>
+        marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY
+        && marketChange.lastCandleDeviationPercent > -0.5
+        && checkLastMarket(marketChange, lastMarkets)
+    );
     if (filtered.length > 0) {
+        fileService.storeLastMarket(filtered);
+        var message = "Markets Now\n============\n"
         message = message +
-            filtered.map(marketChange => `${marketChange.symbol} - ${marketChange.changePercent.toPrecision(2)} - Trend - ${marketChange.lastCandleDeviationPercent} %\n`)
+            filtered.map(marketChange => `${marketChange.symbol} - ${marketChange.changePercent.toPrecision(2)} - Trend - ${marketChange.lastCandleDeviationPercent.toPrecision(2)} - ${marketChange.url}\n`)
                 .join("")
         console.log(message);
         telegramService.postMessage(message);
