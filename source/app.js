@@ -16,6 +16,11 @@ app.get('/', (req, res) => {
     res.send('Hello World!' + new Date())
 })
 
+app.get('/candle/:marketPair', async (req, res) => {
+    const candles = await candleService.fetchCandles(req.params.marketPair);
+    res.send(candles);
+})
+
 app.get('/user', async (req, res) => {
     const user = await userService.getUser();
     res.send(user);
@@ -40,7 +45,6 @@ app.post('/telegram/message', async (req, res) => {
 })
 
 app.post('/telegram/alert', async (req, res) => {
-
     const response = await telegramService.postMessage(req.body.message);
     res.send(response);
 })

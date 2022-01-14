@@ -1,5 +1,4 @@
 import axios from 'axios';
-import stub from './stub';
 import _, { isError } from 'lodash';
 
 const fetchCandles = async (marketPair, limit = 180) => {
@@ -7,9 +6,10 @@ const fetchCandles = async (marketPair, limit = 180) => {
         .get(`https://public.coindcx.com/market_data/candles?pair=${marketPair}&interval=1m&limit=${limit}`)
         .catch(error => {
             console.log(error.response.data);
-            return [];
+            return {
+                data: []
+            };
         });
-    // const response = stub;
     return response.data.map((candle, index) => {
         return {
             ...candle,
