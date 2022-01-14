@@ -4,6 +4,7 @@ import candleService from '../services/candleService';
 import fileService from '../services/fileService';
 import marketDetails from '../services/marketDetails';
 import telegramService from '../services/telegramService';
+import userService from '../services/userService';
 
 dotenv.config();
 const BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
@@ -32,6 +33,7 @@ const getMarketChanges = async () => {
             changePercent,
             recentCandleValue,
             lastCandleDeviationPercent,
+            currency: investingMarket.target_currency_short_name,
             url: `https://coindcx.com/trade/${investingMarket.symbol}`
         };
     })
@@ -50,24 +52,39 @@ const checkLastMarket = (marketChange, lastMarkets) => {
     }
     else return true;
 }
-
-getMarketChanges().then(marketChanges => {
-    console.log(marketChanges);
+const formatNumber = num => {
+    if(num<0){
+        return `-(${num.toPrecision(2)*-1})`
+    }
+    return num.toPrecision(2)
+}
+Promise.all([getMarketChanges(), userService.getBalances()]).then(values => {
+    const marketChanges = values[0];
+    const balances = values[1];
     var lastMarkets = fileService.readLastMarket();
     lastMarkets = _.keyBy(lastMarkets, lastMarket => lastMarket.symbol);
+    const investedCurrencies = balances.map(balance => balance.currency);
+    const bearInvestments = marketChanges
+        .filter(marketChange =>
+            investedCurrencies.indexOf(marketChange.currency) > 0
+            && marketChange.changePercent < -3.5
+        );
 
-    const filtered = marketChanges.filter(marketChange =>
+    var filtered = marketChanges.filter(marketChange =>
         marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY
         && marketChange.lastCandleDeviationPercent > -0.5
         && checkLastMarket(marketChange, lastMarkets)
     );
+    filtered = filtered.concat(bearInvestments)
     if (filtered.length > 0) {
         fileService.storeLastMarket(filtered);
         var message = "<b>Markets Now\n</b>"
+        message = message + "___________________\n\n"
         message = message +
-            filtered.map(marketChange => 
-                `<a href="${marketChange.url}">${marketChange.symbol}</a> - ${marketChange.changePercent.toPrecision(2)} - Trend - ${marketChange.lastCandleDeviationPercent.toPrecision(2)}\n`)
+            filtered.map(marketChange =>
+                `<a href="${marketChange.url}">${marketChange.symbol}</a> - ${formatNumber(marketChange.changePercent)} - Trend - ${formatNumber(marketChange.lastCandleDeviationPercent)}\n`)
                 .join("")
+        message = message + '\n <a href="http://go.coindcx.com">Open App</a>\n'
         console.log(message);
         telegramService.postMessage(message);
     }

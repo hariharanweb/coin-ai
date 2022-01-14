@@ -8,7 +8,8 @@ const getHeaders = body => {
     const signature = crypto.createHmac('sha256', COIN_DCX_SECRET).update(payload).digest('hex')
     return {
         'X-AUTH-APIKEY': COIN_DCX_KEY,
-        'X-AUTH-SIGNATURE': signature
+        'X-AUTH-SIGNATURE': signature,
+        'Content-Type': 'application/json'
     }
 }
 
