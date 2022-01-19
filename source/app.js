@@ -21,23 +21,23 @@ app.get('/candle/:marketPair', async (req, res) => {
     res.send(candles);
 })
 
-app.get('/user', async (req, res) => {
-    const user = await userService.getUser();
-    res.send(user);
-})
+// app.get('/user', async (req, res) => {
+//     const user = await userService.getUser();
+//     res.send(user);
+// })
 
-app.get('/user/balances', async (req, res) => {
-    const balances = await userService.getBalances();
-    res.send(balances);
-})
+// app.get('/user/balances', async (req, res) => {
+//     const balances = await userService.getBalances();
+//     res.send(balances);
+// })
 
-app.post('/user/order', async (req, res) => {
-    const body = req.body;
-    const recentCandle = await candleService.fetchCandles(body.marketPair, 1);
-    const lastClose = recentCandle[0].close;
-    const order = await orderService.order(body.marketPair, lastClose, body.amount);
-    res.send(order);
-})
+// app.post('/user/order', async (req, res) => {
+//     const body = req.body;
+//     const recentCandle = await candleService.fetchCandles(body.marketPair, 1);
+//     const lastClose = recentCandle[0].close;
+//     const order = await orderService.order(body.marketPair, lastClose, body.amount);
+//     res.send(order);
+// })
 
 app.post('/telegram/message', async (req, res) => {
     const response = await telegramService.postMessage(req.body.message);
