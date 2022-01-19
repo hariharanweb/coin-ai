@@ -61,7 +61,7 @@ const formatNumber = num => {
 Promise.all([getMarketChanges(), userService.getBalances()]).then(values => {
     const marketChanges = values[0];
     const balances = values[1];
-    var lastMarkets = fileService.readLastMarket();
+    var lastMarkets = [];
     lastMarkets = _.keyBy(lastMarkets, lastMarket => lastMarket.symbol);
     const investedCurrencies = balances.map(balance => balance.currency);
     const bearInvestments = marketChanges
@@ -77,7 +77,7 @@ Promise.all([getMarketChanges(), userService.getBalances()]).then(values => {
     );
     filtered = filtered.concat(bearInvestments)
     if (filtered.length > 0) {
-        fileService.storeLastMarket(filtered);
+        // fileService.storeLastMarket(filtered);
         var message = "<b>Markets Now\n</b>"
         message = message + "___________________\n\n"
         message = message +
