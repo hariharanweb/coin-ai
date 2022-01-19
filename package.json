@@ -12,7 +12,7 @@
     "clean": "rimraf dist-server",
     "watch:dev": "nodemon",
     "alerter": "node -r dotenv/config ./dist-server/alerter/alerter",
-    "alert":"NODE_ENV=production npm-run-all build alerter"
+    "alert": "NODE_ENV=production npm-run-all build alerter"
   },
   "dependencies": {
     "@babel/cli": "^7.16.7",
@@ -55,7 +55,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-transform-runtime": "^7.16.7",
+    "@babel/plugin-transform-runtime": "^7.16.8",
     "babel-plugin-transform-runtime": "^6.23.0"
   }
 }
