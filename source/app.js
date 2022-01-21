@@ -46,8 +46,9 @@ app.post('/telegram/message', async (req, res) => {
     res.send(response);
 })
 
-app.get('/telegram/alert', async (req, res) => {
-    await alerter.alert();
+app.get('/telegram/alert/:baseCurrency', async (req, res) => {
+    const baseCurrency = req.params.baseCurrency || "INR"
+    await alerter.alert(baseCurrency);
     res.send("Alert Sent");
 })
 
@@ -55,4 +56,4 @@ app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 })
 
-// alertingService.run()
+alertingService.run()

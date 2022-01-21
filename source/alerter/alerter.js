@@ -9,9 +9,9 @@ import userService from '../services/userService';
 dotenv.config();
 const BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
 
-const getMarketChanges = async () => {
+const getMarketChanges = async (baseCurrency="INR") => {
     const investingMarkets = marketDetails.filter(marketDetail =>
-        marketDetail.base_currency_short_name === 'INR'
+        marketDetail.base_currency_short_name === baseCurrency
         //    &&  marketDetail.order_types.indexOf('market_order') >= 0 
     );
     const responses = investingMarkets.map(async investingMarket => {
@@ -59,7 +59,7 @@ const formatNumber = num => {
     return num.toPrecision(2)
 }
 
-const alert = () => Promise.all([getMarketChanges(), userService.getBalances()]).then(values => {
+const alert = (baseCurrency="INR") => Promise.all([getMarketChanges(baseCurrency), userService.getBalances()]).then(values => {
     const marketChanges = values[0];
     const balances = values[1];
     var lastMarkets = [];
@@ -80,7 +80,7 @@ const alert = () => Promise.all([getMarketChanges(), userService.getBalances()])
     filtered = filtered.concat(bearInvestments)
     if (filtered.length > 0) {
         // fileService.storeLastMarket(filtered);
-        var message = "<b>Markets Now\n</b>"
+        var message = `<b>Markets Now for ${baseCurrency}\n</b>`
         message = message + "___________________\n\n"
         message = message +
             filtered.map(marketChange =>

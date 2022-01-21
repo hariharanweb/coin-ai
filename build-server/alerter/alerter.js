@@ -31,13 +31,17 @@ var BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
 
 var getMarketChanges = /*#__PURE__*/function () {
   var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
-    var investingMarkets, responses;
+    var baseCurrency,
+        investingMarkets,
+        responses,
+        _args2 = arguments;
     return _regenerator["default"].wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
+            baseCurrency = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : "INR";
             investingMarkets = _marketDetails["default"].filter(function (marketDetail) {
-              return marketDetail.base_currency_short_name === 'INR';
+              return marketDetail.base_currency_short_name === baseCurrency;
             } //    &&  marketDetail.order_types.indexOf('market_order') >= 0 
             );
             responses = investingMarkets.map( /*#__PURE__*/function () {
@@ -94,7 +98,7 @@ var getMarketChanges = /*#__PURE__*/function () {
                 return _ref2.apply(this, arguments);
               };
             }());
-            _context2.next = 4;
+            _context2.next = 5;
             return Promise.all(responses).then(function (marketChanges) {
               var filtered = _lodash["default"].filter(marketChanges, function (marketChange) {
                 return marketChange !== null;
@@ -103,10 +107,10 @@ var getMarketChanges = /*#__PURE__*/function () {
               return _lodash["default"].sortBy(filtered, 'changePercent').reverse();
             });
 
-          case 4:
+          case 5:
             return _context2.abrupt("return", _context2.sent);
 
-          case 5:
+          case 6:
           case "end":
             return _context2.stop();
         }
@@ -137,7 +141,8 @@ var formatNumber = function formatNumber(num) {
 };
 
 var alert = function alert() {
-  return Promise.all([getMarketChanges(), _userService["default"].getBalances()]).then(function (values) {
+  var baseCurrency = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "INR";
+  return Promise.all([getMarketChanges(baseCurrency), _userService["default"].getBalances()]).then(function (values) {
     var marketChanges = values[0];
     var balances = values[1];
     var lastMarkets = [];
@@ -158,7 +163,7 @@ var alert = function alert() {
 
     if (filtered.length > 0) {
       // fileService.storeLastMarket(filtered);
-      var message = "<b>Markets Now\n</b>";
+      var message = "<b>Markets Now for ".concat(baseCurrency, "\n</b>");
       message = message + "___________________\n\n";
       message = message + filtered.map(function (marketChange) {
         return "<a href=\"".concat(marketChange.url, "\">").concat(marketChange.symbol, "</a> - ").concat(formatNumber(marketChange.changePercent), " - Trend - ").concat(formatNumber(marketChange.lastCandleDeviationPercent), "\n");

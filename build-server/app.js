@@ -124,19 +124,21 @@ app.post('/telegram/message', /*#__PURE__*/function () {
     return _ref3.apply(this, arguments);
   };
 }());
-app.get('/telegram/alert', /*#__PURE__*/function () {
+app.get('/telegram/alert/:baseCurrency', /*#__PURE__*/function () {
   var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(req, res) {
+    var baseCurrency;
     return _regenerator["default"].wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
-            _context4.next = 2;
-            return _alerter["default"].alert();
-
-          case 2:
-            res.send("Alert Sent");
+            baseCurrency = req.params.baseCurrency || "INR";
+            _context4.next = 3;
+            return _alerter["default"].alert(baseCurrency);
 
           case 3:
+            res.send("Alert Sent");
+
+          case 4:
           case "end":
             return _context4.stop();
         }
@@ -150,4 +152,6 @@ app.get('/telegram/alert', /*#__PURE__*/function () {
 }());
 app.listen(port, function () {
   console.log("Example app listening at http://localhost:".concat(port));
-}); // alertingService.run()
+});
+
+_alertingService["default"].run();
