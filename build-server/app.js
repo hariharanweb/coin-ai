@@ -134,6 +134,9 @@ app.get('/telegram/alert', /*#__PURE__*/function () {
             return _alerter["default"].alert();
 
           case 2:
+            res.send("Alert Sent");
+
+          case 3:
           case "end":
             return _context4.stop();
         }

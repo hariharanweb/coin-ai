@@ -48,6 +48,7 @@ app.post('/telegram/message', async (req, res) => {
 
 app.get('/telegram/alert', async (req, res) => {
     await alerter.alert();
+    res.send("Alert Sent");
 })
 
 app.listen(port, () => {
