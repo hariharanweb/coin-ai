@@ -16,6 +16,7 @@ const getMarketChanges = async () => {
     );
     const responses = investingMarkets.map(async investingMarket => {
         const candles = await candleService.fetchCandles(investingMarket.pair);
+        if(candles.length === 0) return null; 
         const meanByParameter = 'close';
         const tenPercent = Math.round(candles.length * 0.1);
         const recentCandles = candles.slice(0, tenPercent);
@@ -38,9 +39,8 @@ const getMarketChanges = async () => {
         };
     })
     return await Promise.all(responses).then(marketChanges => {
-        return _.sortBy(marketChanges, 'changePercent')
-            .reverse()
-
+        const  filtered = _.filter(marketChanges, marketChange => marketChange !== null)
+        return _.sortBy(filtered,'changePercent').reverse()
     });
 }
 
@@ -58,7 +58,8 @@ const formatNumber = num => {
     }
     return num.toPrecision(2)
 }
-Promise.all([getMarketChanges(), userService.getBalances()]).then(values => {
+
+const alert = () => Promise.all([getMarketChanges(), userService.getBalances()]).then(values => {
     const marketChanges = values[0];
     const balances = values[1];
     var lastMarkets = [];
@@ -90,5 +91,7 @@ Promise.all([getMarketChanges(), userService.getBalances()]).then(values => {
     }
 });
 
-
+export default {
+    alert
+}
 

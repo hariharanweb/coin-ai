@@ -5,6 +5,8 @@ import bodyParser from 'body-parser';
 import orderService from './services/orderService';
 import candleService from './services/candleService';
 import telegramService from './services/telegramService';
+import alertingService from './services/alertingService';
+import alerter from './alerter/alerter';
 
 dotenv.config();
 const app = express()
@@ -26,10 +28,10 @@ app.get('/candle/:marketPair', async (req, res) => {
 //     res.send(user);
 // })
 
-// app.get('/user/balances', async (req, res) => {
-//     const balances = await userService.getBalances();
-//     res.send(balances);
-// })
+app.get('/user/balances', async (req, res) => {
+    const balances = await userService.getBalances();
+    res.send(balances);
+})
 
 // app.post('/user/order', async (req, res) => {
 //     const body = req.body;
@@ -44,11 +46,12 @@ app.post('/telegram/message', async (req, res) => {
     res.send(response);
 })
 
-app.post('/telegram/alert', async (req, res) => {
-    const response = await telegramService.postMessage(req.body.message);
-    res.send(response);
+app.get('/telegram/alert', async (req, res) => {
+    await alerter.alert();
 })
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 })
+
+alertingService.run()
