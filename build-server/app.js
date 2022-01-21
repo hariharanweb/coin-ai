@@ -27,7 +27,7 @@ var _alerter = _interopRequireDefault(require("./alerter/alerter"));
 _dotenv["default"].config();
 
 var app = (0, _express["default"])();
-var port = 3000;
+var port = process.env.PORT || 3000;
 app.use(_bodyParser["default"].urlencoded({
   extended: false
 }));
