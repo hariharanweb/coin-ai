@@ -64,12 +64,13 @@ const alert = () => Promise.all([getMarketChanges(), userService.getBalances()])
     const balances = values[1];
     var lastMarkets = [];
     lastMarkets = _.keyBy(lastMarkets, lastMarket => lastMarket.symbol);
-    const investedCurrencies = balances.map(balance => balance.currency);
     const bearInvestments = marketChanges
-        .filter(marketChange =>
-            investedCurrencies.indexOf(marketChange.currency) > 0
+        .filter(marketChange =>{
+            const balanceFound = _.find(balances, balance=> balance.currency === marketChange.currency)
+            return balanceFound
             && marketChange.changePercent < -3.5
-        );
+            && marketChange.recentCandleValue * balanceFound.balance > 20
+        });
 
     var filtered = marketChanges.filter(marketChange =>
         marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY

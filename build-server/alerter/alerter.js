@@ -144,11 +144,12 @@ var alert = function alert() {
     lastMarkets = _lodash["default"].keyBy(lastMarkets, function (lastMarket) {
       return lastMarket.symbol;
     });
-    var investedCurrencies = balances.map(function (balance) {
-      return balance.currency;
-    });
     var bearInvestments = marketChanges.filter(function (marketChange) {
-      return investedCurrencies.indexOf(marketChange.currency) > 0 && marketChange.changePercent < -3.5;
+      var balanceFound = _lodash["default"].find(balances, function (balance) {
+        return balance.currency === marketChange.currency;
+      });
+
+      return balanceFound && marketChange.changePercent < -3.5 && marketChange.recentCandleValue * balanceFound.balance > 20;
     });
     var filtered = marketChanges.filter(function (marketChange) {
       return marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY && marketChange.lastCandleDeviationPercent > -0.5 && checkLastMarket(marketChange, lastMarkets);
