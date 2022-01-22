@@ -132,13 +132,12 @@ app.get('/telegram/alert/:baseCurrency', /*#__PURE__*/function () {
         switch (_context4.prev = _context4.next) {
           case 0:
             baseCurrency = req.params.baseCurrency || "INR";
-            _context4.next = 3;
-            return _alerter["default"].alert(baseCurrency);
 
-          case 3:
+            _alerter["default"].alert(baseCurrency);
+
             res.send("Alert Sent");
 
-          case 4:
+          case 3:
           case "end":
             return _context4.stop();
         }

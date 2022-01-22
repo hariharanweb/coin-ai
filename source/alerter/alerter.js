@@ -86,7 +86,10 @@ const alert = (baseCurrency="INR") => Promise.all([getMarketChanges(baseCurrency
             filtered.map(marketChange =>
                 `<a href="${marketChange.url}">${marketChange.symbol}</a> - ${formatNumber(marketChange.changePercent)} - Trend - ${formatNumber(marketChange.lastCandleDeviationPercent)}\n`)
                 .join("")
-        message = message + '\n <a href="http://go.coindcx.com">Open App</a>\n'
+        message = message + '\n<a href="http://go.coindcx.com">Open App</a>\n'
+        message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">INR Alerts</a>\n'
+        message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">BTC Alerts</a>\n'
+        message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/USDT">USDT Alerts</a>\n'
         console.log(message);
         telegramService.postMessage(message);
     }

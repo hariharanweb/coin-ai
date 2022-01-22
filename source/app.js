@@ -48,7 +48,7 @@ app.post('/telegram/message', async (req, res) => {
 
 app.get('/telegram/alert/:baseCurrency', async (req, res) => {
     const baseCurrency = req.params.baseCurrency || "INR"
-    await alerter.alert(baseCurrency);
+    alerter.alert(baseCurrency);
     res.send("Alert Sent");
 })
 

@@ -168,7 +168,10 @@ var alert = function alert() {
       message = message + filtered.map(function (marketChange) {
         return "<a href=\"".concat(marketChange.url, "\">").concat(marketChange.symbol, "</a> - ").concat(formatNumber(marketChange.changePercent), " - Trend - ").concat(formatNumber(marketChange.lastCandleDeviationPercent), "\n");
       }).join("");
-      message = message + '\n <a href="http://go.coindcx.com">Open App</a>\n';
+      message = message + '\n<a href="http://go.coindcx.com">Open App</a>\n';
+      message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">INR Alerts</a>\n';
+      message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">BTC Alerts</a>\n';
+      message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/USDT">USDT Alerts</a>\n';
       console.log(message);
 
       _telegramService["default"].postMessage(message);
