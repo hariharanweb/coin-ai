@@ -42,8 +42,7 @@ var getMarketChanges = /*#__PURE__*/function () {
             baseCurrency = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : "INR";
             investingMarkets = _marketDetails["default"].filter(function (marketDetail) {
               return marketDetail.base_currency_short_name === baseCurrency;
-            } //    &&  marketDetail.order_types.indexOf('market_order') >= 0 
-            );
+            });
             responses = investingMarkets.map( /*#__PURE__*/function () {
               var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(investingMarket) {
                 var candles, meanByParameter, tenPercent, recentCandles, oldCandles, recentMean, oldMean, changePercent, recentCandleValue, lastCandleDeviationPercent;

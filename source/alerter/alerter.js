@@ -12,7 +12,6 @@ const BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
 const getMarketChanges = async (baseCurrency="INR") => {
     const investingMarkets = marketDetails.filter(marketDetail =>
         marketDetail.base_currency_short_name === baseCurrency
-        //    &&  marketDetail.order_types.indexOf('market_order') >= 0 
     );
     const responses = investingMarkets.map(async investingMarket => {
         const candles = await candleService.fetchCandles(investingMarket.pair);

@@ -15,15 +15,15 @@ var _nodeSchedule = _interopRequireDefault(require("node-schedule"));
 
 var _alerter = _interopRequireDefault(require("../alerter/alerter"));
 
-var run = function run() {
-  var job = _nodeSchedule["default"].scheduleJob('*/15 * * * *', /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
+var scheduleJob = function scheduleJob(min, currency) {
+  return _nodeSchedule["default"].scheduleJob("".concat(min, " * * * *"), /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
     return _regenerator["default"].wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            console.log("Exec at ".concat(new Date()), _alerter["default"]);
+            console.log("Exec at ".concat(new Date(), " for ").concat(currency));
 
-            _alerter["default"].alert();
+            _alerter["default"].alert(currency);
 
           case 2:
           case "end":
@@ -32,50 +32,27 @@ var run = function run() {
       }
     }, _callee);
   })));
+};
 
-  console.log('Scheduled a alerting job');
+var run = function run() {
+  [0, 15, 30, 45].forEach(function (time) {
+    return scheduleJob(time, 'INR');
+  });
+  console.log('Scheduled a alerting job for INR');
 };
 
 var runBTC = function runBTC() {
-  var job = _nodeSchedule["default"].scheduleJob('*/15 * * * *', /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
-    return _regenerator["default"].wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            console.log("Exec at ".concat(new Date()), _alerter["default"]);
-
-            _alerter["default"].alert("BTC");
-
-          case 2:
-          case "end":
-            return _context2.stop();
-        }
-      }
-    }, _callee2);
-  })));
-
-  console.log('Scheduled a alerting job');
+  [5, 20, 35, 50].forEach(function (time) {
+    return scheduleJob(time, 'BTC');
+  });
+  console.log('Scheduled a alerting job for BTC');
 };
 
 var runUSDT = function runUSDT() {
-  var job = _nodeSchedule["default"].scheduleJob('*/15 * * * *', /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3() {
-    return _regenerator["default"].wrap(function _callee3$(_context3) {
-      while (1) {
-        switch (_context3.prev = _context3.next) {
-          case 0:
-            console.log("Exec at ".concat(new Date()), _alerter["default"]);
-
-            _alerter["default"].alert("USDT");
-
-          case 2:
-          case "end":
-            return _context3.stop();
-        }
-      }
-    }, _callee3);
-  })));
-
-  console.log('Scheduled a alerting job');
+  [10, 25, 40, 55].forEach(function (time) {
+    return scheduleJob(time, 'USDT');
+  });
+  console.log('Scheduled a alerting job for USDT');
 };
 
 var _default = {

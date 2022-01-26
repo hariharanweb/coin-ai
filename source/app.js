@@ -57,3 +57,5 @@ app.listen(port, () => {
 })
 
 alertingService.run()
+alertingService.runBTC()
+alertingService.runUSDT()

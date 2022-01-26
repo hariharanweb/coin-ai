@@ -154,3 +154,7 @@ app.listen(port, function () {
 });
 
 _alertingService["default"].run();
+
+_alertingService["default"].runBTC();
+
+_alertingService["default"].runUSDT();
