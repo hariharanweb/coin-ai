@@ -7,6 +7,8 @@ import candleService from './services/candleService';
 import telegramService from './services/telegramService';
 import alertingService from './services/alertingService';
 import alerter from './alerter/alerter';
+import marketDetails from "./services/marketDetails";
+import _ from 'lodash';
 
 dotenv.config();
 const app = express()
@@ -21,6 +23,13 @@ app.get('/', (req, res) => {
 app.get('/candle/:marketPair', async (req, res) => {
     const candles = await candleService.fetchCandles(req.params.marketPair);
     res.send(candles);
+})
+
+app.get('/data/:marketPair', async (req, res) => {
+    const investingMarket = _.find(marketDetails, {pair: req.params.marketPair})
+    const data = await candleService.getMarketData(investingMarket);
+    console.log('fata',data)
+    res.send(data);
 })
 
 // app.get('/user', async (req, res) => {
