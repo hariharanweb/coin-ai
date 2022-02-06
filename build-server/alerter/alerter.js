@@ -74,7 +74,7 @@ var getMarketChanges = /*#__PURE__*/function () {
                 return marketChange !== null;
               });
 
-              return _lodash["default"].sortBy(filtered, 'changePercent').reverse();
+              return filtered;
             });
 
           case 5:
@@ -111,14 +111,14 @@ var formatNumber = function formatNumber(num) {
 };
 
 function addLinks(message) {
-  message = message + '\n<a href="http://go.coindcx.com">Open App</a>\n';
-  message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">INR Alerts</a>\n';
-  message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">BTC Alerts</a>\n';
-  return message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/USDT">USDT Alerts</a>\n';
+  message = message + '\n<a href="http://go.coindcx.com">Open App</a>';
+  message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">Send <b>INR Alerts</b></a>';
+  message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">Send <b>BTC Alerts</b></a>';
+  return message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/USDT">Send <b>USDT Alerts</b></a>';
 }
 
 var getMessageToSend = function getMessageToSend(message, data, type) {
-  message = message + "------By ".concat(type, "----\n");
+  message = message + "\n------By ".concat(type, "----\n\n");
   message = message + data.map(function (marketChange) {
     return "<a href=\"".concat(marketChange.url, "\">").concat(marketChange.symbol, "</a>") + " - M ".concat(formatNumber(marketChange.changePercent), " ") + " - V ".concat(formatNumber(marketChange.changeVolumePercent), "\n");
   }).join("");
@@ -141,12 +141,15 @@ var alert = function alert() {
 
       return balanceFound && marketChange.changePercent < -3.5 && marketChange.recentCandleValue * balanceFound.balance > 20;
     });
-    var filteredByValue = marketChanges.filter(function (marketChange) {
+
+    var filteredByValue = _lodash["default"].sortBy(marketChanges, 'changePercent').reverse().filter(function (marketChange) {
       return marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY && marketChange.lastCandleDeviationPercent > -0.5 && checkLastMarket(marketChange, lastMarkets);
     }).slice(0, 3);
-    var filteredByVolume = marketChanges.filter(function (marketChange) {
-      return marketChange.changeVolumePercent > BULL_THRESHOLD_TO_NOTIFY && marketChange.lastCandleDeviationPercent > -0.5;
+
+    var filteredByVolume = _lodash["default"].sortBy(marketChanges, 'changeVolumePercent').reverse().filter(function (marketChange) {
+      return marketChange.changeVolumePercent > BULL_VOLUME_THRESHOLD_TO_NOTIFY;
     }).slice(0, 3);
+
     filteredByValue = filteredByValue.concat(bearInvestments);
     var message = "<b>Markets Now for ".concat(baseCurrency, "\n</b>");
 
@@ -156,7 +159,7 @@ var alert = function alert() {
       }
 
       if (filteredByValue.length > 0) {
-        message = getMessageToSend(message, filteredByValue, 'Volume');
+        message = getMessageToSend(message, filteredByVolume, 'Volume');
       }
 
       message = addLinks(message);
