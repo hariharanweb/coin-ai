@@ -29,6 +29,8 @@ _dotenv["default"].config();
 
 var BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
 var BULL_VOLUME_THRESHOLD_TO_NOTIFY = (_process$env$BULL_VOL = process.env.BULL_VOLUME_THRESHOLD_TO_NOTIFY) !== null && _process$env$BULL_VOL !== void 0 ? _process$env$BULL_VOL : 10;
+var DOLLAR = "\uD83D\uDCB0";
+var BOX = "\uD83D\uDCE6";
 
 var getMarketChanges = /*#__PURE__*/function () {
   var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
@@ -120,7 +122,7 @@ function addLinks(message) {
 var getMessageToSend = function getMessageToSend(message, data, type) {
   message = message + "\n------By ".concat(type, "----\n\n");
   message = message + data.map(function (marketChange) {
-    return "<a href=\"".concat(marketChange.url, "\">").concat(marketChange.symbol, "</a>") + " - M ".concat(formatNumber(marketChange.changePercent), " ") + " - V ".concat(formatNumber(marketChange.changeVolumePercent), "\n");
+    return "<a href=\"".concat(marketChange.url, "\">").concat(marketChange.symbol, "</a>") + " - ".concat(DOLLAR, " ").concat(formatNumber(marketChange.changePercent), "% ") + " - ".concat(BOX, " ").concat(formatNumber(marketChange.changeVolumePercent), "%\n");
   }).join("");
   return message;
 };
@@ -144,7 +146,7 @@ var alert = function alert() {
 
     var filteredByValue = _lodash["default"].sortBy(marketChanges, 'changePercent').reverse().filter(function (marketChange) {
       return marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY && marketChange.lastCandleDeviationPercent > -0.5 && checkLastMarket(marketChange, lastMarkets);
-    }).slice(0, 3);
+    }).slice(0, 5);
 
     var filteredByVolume = _lodash["default"].sortBy(marketChanges, 'changeVolumePercent').reverse().filter(function (marketChange) {
       return marketChange.changeVolumePercent > BULL_VOLUME_THRESHOLD_TO_NOTIFY;

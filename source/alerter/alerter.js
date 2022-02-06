@@ -8,6 +8,8 @@ import userService from '../services/userService';
 dotenv.config();
 const BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
 const BULL_VOLUME_THRESHOLD_TO_NOTIFY = process.env.BULL_VOLUME_THRESHOLD_TO_NOTIFY ?? 10;
+const DOLLAR = "\u{1F4B0}"
+const BOX = "\u{1F4E6}"
 
 const getMarketChanges = async (baseCurrency = "INR") => {
     const investingMarkets = marketDetails.filter(marketDetail =>
@@ -48,8 +50,8 @@ const getMessageToSend = (message, data, type) => {
     message = message +
         data.map(marketChange =>
             `<a href="${marketChange.url}">${marketChange.symbol}</a>` +
-            ` - M ${formatNumber(marketChange.changePercent)} ` +
-            ` - V ${formatNumber(marketChange.changeVolumePercent)}\n`
+            ` - ${DOLLAR} ${formatNumber(marketChange.changePercent)}% ` +
+            ` - ${BOX} ${formatNumber(marketChange.changeVolumePercent)}%\n`
         ).join("")
     return message;
 }
@@ -71,10 +73,12 @@ const alert = (baseCurrency = "INR") => Promise.all([getMarketChanges(baseCurren
         marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY
         && marketChange.lastCandleDeviationPercent > -0.5
         && checkLastMarket(marketChange, lastMarkets)
-    ).slice(0, 3);
+    ).slice(0, 5);
+
     let filteredByVolume = _.sortBy(marketChanges, 'changeVolumePercent').reverse().filter(marketChange =>
         marketChange.changeVolumePercent > BULL_VOLUME_THRESHOLD_TO_NOTIFY
     ).slice(0, 3);
+    
     filteredByValue = filteredByValue.concat(bearInvestments);
     let message = `<b>Markets Now for ${baseCurrency}\n</b>`;
     if (filteredByValue.length > 0 || filteredByVolume.length > 0) {
