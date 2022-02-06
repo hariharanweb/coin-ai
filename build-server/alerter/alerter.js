@@ -133,7 +133,7 @@ var alert = function alert() {
       var message = "<b>Markets Now for ".concat(baseCurrency, "\n</b>");
       message = message + "___________________\n\n";
       message = message + filtered.map(function (marketChange) {
-        return "<a href=\"".concat(marketChange.url, "\">").concat(marketChange.symbol, "</a> - ").concat(formatNumber(marketChange.changePercent), " - Trend - ").concat(formatNumber(marketChange.lastCandleDeviationPercent), "\n");
+        return "<a href=\"".concat(marketChange.url, "\">").concat(marketChange.symbol, "</a>") + " - M ".concat(formatNumber(marketChange.changePercent), " ") + " - V ".concat(formatNumber(marketChange.changeVolumePercent), " ");
       }).join("");
       message = message + '\n<a href="http://go.coindcx.com">Open App</a>\n';
       message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">INR Alerts</a>\n';

@@ -24,6 +24,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 var fetchCandles = /*#__PURE__*/function () {
   var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(marketPair) {
     var limit,
+        emptyData,
         response,
         _args = arguments;
     return _regenerator["default"].wrap(function _callee$(_context) {
@@ -31,18 +32,25 @@ var fetchCandles = /*#__PURE__*/function () {
         switch (_context.prev = _context.next) {
           case 0:
             limit = _args.length > 1 && _args[1] !== undefined ? _args[1] : 180;
-            _context.next = 3;
+            emptyData = {
+              data: []
+            };
+            _context.next = 4;
             return _axios["default"].get("https://public.coindcx.com/market_data/candles?pair=".concat(marketPair, "&interval=1m&limit=").concat(limit))["catch"](function (error) {
               if (error.response) {
                 console.log(error.response.data);
-                return {
-                  data: []
-                };
+                return emptyData;
               }
             });
 
-          case 3:
+          case 4:
             response = _context.sent;
+
+            if (!(response && response.data)) {
+              _context.next = 9;
+              break;
+            }
+
             return _context.abrupt("return", response.data.map(function (candle, index) {
               return _objectSpread(_objectSpread({}, candle), {}, {
                 index: index,
@@ -50,7 +58,10 @@ var fetchCandles = /*#__PURE__*/function () {
               });
             }));
 
-          case 5:
+          case 9:
+            return _context.abrupt("return", emptyData);
+
+          case 10:
           case "end":
             return _context.stop();
         }
@@ -93,8 +104,8 @@ var getMarketData = /*#__PURE__*/function () {
             recentVolumeMean = _lodash["default"].meanBy(recent, volume);
             oldValueMean = _lodash["default"].meanBy(old, meanByParameter);
             oldVolumeMean = _lodash["default"].meanBy(old, volume);
-            changeValuePercent = (recentValueMean - oldValueMean) * 100 / oldValueMean;
-            changeVolumePercent = (recentVolumeMean - oldVolumeMean) * 100 / oldVolumeMean;
+            changeValuePercent = oldValueMean !== 0 ? (recentValueMean - oldValueMean) * 100 / oldValueMean : 0;
+            changeVolumePercent = oldVolumeMean !== 0 ? (recentVolumeMean - oldVolumeMean) * 100 / oldVolumeMean : 0;
             recentCandleValue = candles[0][meanByParameter];
             recentCandleVolume = candles[0][volume];
             lastCandleDeviationPercent = (recentCandleValue - recentValueMean) * 100 / recentValueMean;

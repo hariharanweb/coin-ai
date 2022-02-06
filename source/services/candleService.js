@@ -2,23 +2,28 @@ import axios from 'axios';
 import _ from "lodash";
 
 const fetchCandles = async (marketPair, limit = 180) => {
+    const emptyData = {
+        data: []
+    };
     const response = await axios
         .get(`https://public.coindcx.com/market_data/candles?pair=${marketPair}&interval=1m&limit=${limit}`)
         .catch(error => {
-            if(error.response){
+            if (error.response) {
                 console.log(error.response.data);
-                return {
-                    data: []
-                };
+                return emptyData;
             }
         });
-    return response.data.map((candle, index) => {
-        return {
-            ...candle,
-            index,
-            date: new Date(candle.time).toTimeString()
-        }
-    })
+    if(response && response.data){
+        return response.data.map((candle, index) => {
+            return {
+                ...candle,
+                index,
+                date: new Date(candle.time).toTimeString()
+            }
+        })
+    } else {
+        return emptyData;
+    }
 }
 
 const getMarketData = async investingMarket => {
@@ -33,8 +38,8 @@ const getMarketData = async investingMarket => {
     const recentVolumeMean = _.meanBy(recent, volume);
     const oldValueMean = _.meanBy(old, meanByParameter);
     const oldVolumeMean = _.meanBy(old, volume);
-    const changeValuePercent = (recentValueMean - oldValueMean) * 100 / oldValueMean;
-    const changeVolumePercent = (recentVolumeMean - oldVolumeMean) * 100 / oldVolumeMean;
+    const changeValuePercent = oldValueMean !== 0 ? (recentValueMean - oldValueMean) * 100 / oldValueMean : 0;
+    const changeVolumePercent = oldVolumeMean !== 0 ? (recentVolumeMean - oldVolumeMean) * 100 / oldVolumeMean : 0;
     const recentCandleValue = candles[0][meanByParameter];
     const recentCandleVolume = candles[0][volume];
     const lastCandleDeviationPercent = (recentCandleValue - recentValueMean) * 100 / recentValueMean;

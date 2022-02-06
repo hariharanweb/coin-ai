@@ -38,7 +38,7 @@ const formatNumber = num => {
 const alert = (baseCurrency = "INR") => Promise.all([getMarketChanges(baseCurrency), userService.getBalances()]).then(values => {
     const marketChanges = values[0];
     const balances = values[1];
-    var lastMarkets = [];
+    let lastMarkets = [];
     lastMarkets = _.keyBy(lastMarkets, lastMarket => lastMarket.symbol);
     const bearInvestments = marketChanges
         .filter(marketChange => {
@@ -48,20 +48,22 @@ const alert = (baseCurrency = "INR") => Promise.all([getMarketChanges(baseCurren
                 && marketChange.recentCandleValue * balanceFound.balance > 20
         });
 
-    var filtered = marketChanges.filter(marketChange =>
+    let filtered = marketChanges.filter(marketChange =>
         marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY
         && marketChange.lastCandleDeviationPercent > -0.5
         && checkLastMarket(marketChange, lastMarkets)
     );
-    filtered = filtered.concat(bearInvestments)
+    filtered = filtered.concat(bearInvestments);
     if (filtered.length > 0) {
         // fileService.storeLastMarket(filtered);
-        var message = `<b>Markets Now for ${baseCurrency}\n</b>`
+        let message = `<b>Markets Now for ${baseCurrency}\n</b>`;
         message = message + "___________________\n\n"
         message = message +
             filtered.map(marketChange =>
-                `<a href="${marketChange.url}">${marketChange.symbol}</a> - ${formatNumber(marketChange.changePercent)} - Trend - ${formatNumber(marketChange.lastCandleDeviationPercent)}\n`)
-                .join("")
+                `<a href="${marketChange.url}">${marketChange.symbol}</a>`+
+                ` - M ${formatNumber(marketChange.changePercent)} `+
+                ` - V ${formatNumber(marketChange.changeVolumePercent)} `
+            ).join("")
         message = message + '\n<a href="http://go.coindcx.com">Open App</a>\n'
         message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">INR Alerts</a>\n'
         message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">BTC Alerts</a>\n'
