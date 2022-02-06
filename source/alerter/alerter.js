@@ -7,6 +7,7 @@ import userService from '../services/userService';
 
 dotenv.config();
 const BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
+const BULL_VOLUME_THRESHOLD_TO_NOTIFY = process.env.BULL_VOLUME_THRESHOLD_TO_NOTIFY ?? 10;
 
 const getMarketChanges = async (baseCurrency = "INR") => {
     const investingMarkets = marketDetails.filter(marketDetail =>
@@ -35,6 +36,24 @@ const formatNumber = num => {
     return num.toPrecision(2)
 }
 
+function addLinks(message) {
+    message = message + '\n<a href="http://go.coindcx.com">Open App</a>\n'
+    message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">INR Alerts</a>\n'
+    message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">BTC Alerts</a>\n'
+    return message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/USDT">USDT Alerts</a>\n'
+}
+
+const getMessageToSend = (message, data, type) => {
+    message = message + `------By ${type}----\n`
+    message = message +
+        data.map(marketChange =>
+            `<a href="${marketChange.url}">${marketChange.symbol}</a>` +
+            ` - M ${formatNumber(marketChange.changePercent)} ` +
+            ` - V ${formatNumber(marketChange.changeVolumePercent)}\n`
+        ).join("")
+    return message;
+}
+
 const alert = (baseCurrency = "INR") => Promise.all([getMarketChanges(baseCurrency), userService.getBalances()]).then(values => {
     const marketChanges = values[0];
     const balances = values[1];
@@ -48,27 +67,25 @@ const alert = (baseCurrency = "INR") => Promise.all([getMarketChanges(baseCurren
                 && marketChange.recentCandleValue * balanceFound.balance > 20
         });
 
-    let filtered = marketChanges.filter(marketChange =>
+    let filteredByValue = marketChanges.filter(marketChange =>
         marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY
         && marketChange.lastCandleDeviationPercent > -0.5
         && checkLastMarket(marketChange, lastMarkets)
-    );
-    filtered = filtered.concat(bearInvestments);
-    if (filtered.length > 0) {
-        // fileService.storeLastMarket(filtered);
-        let message = `<b>Markets Now for ${baseCurrency}\n</b>`;
-        message = message + "___________________\n\n"
-        message = message +
-            filtered.map(marketChange =>
-                `<a href="${marketChange.url}">${marketChange.symbol}</a>`+
-                ` - M ${formatNumber(marketChange.changePercent)} `+
-                ` - V ${formatNumber(marketChange.changeVolumePercent)}\n`
-            ).join("")
-        message = message + '\n<a href="http://go.coindcx.com">Open App</a>\n'
-        message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">INR Alerts</a>\n'
-        message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">BTC Alerts</a>\n'
-        message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/USDT">USDT Alerts</a>\n'
-        console.log(message);
+    ).slice(0, 3);
+    let filteredByVolume = marketChanges.filter(marketChange =>
+        marketChange.changeVolumePercent > BULL_THRESHOLD_TO_NOTIFY
+        && marketChange.lastCandleDeviationPercent > -0.5
+    ).slice(0, 3);
+    filteredByValue = filteredByValue.concat(bearInvestments);
+    let message = `<b>Markets Now for ${baseCurrency}\n</b>`;
+    if (filteredByValue.length > 0 || filteredByVolume.length > 0) {
+        if (filteredByValue.length > 0) {
+            message = getMessageToSend(message, filteredByValue, 'Value');
+        }
+        if (filteredByValue.length > 0) {
+            message = getMessageToSend(message, filteredByValue, 'Volume');
+        }
+        message = addLinks(message);
         telegramService.postMessage(message);
     }
 });

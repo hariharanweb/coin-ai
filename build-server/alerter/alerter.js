@@ -23,9 +23,12 @@ var _telegramService = _interopRequireDefault(require("../services/telegramServi
 
 var _userService = _interopRequireDefault(require("../services/userService"));
 
+var _process$env$BULL_VOL;
+
 _dotenv["default"].config();
 
 var BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
+var BULL_VOLUME_THRESHOLD_TO_NOTIFY = (_process$env$BULL_VOL = process.env.BULL_VOLUME_THRESHOLD_TO_NOTIFY) !== null && _process$env$BULL_VOL !== void 0 ? _process$env$BULL_VOL : 10;
 
 var getMarketChanges = /*#__PURE__*/function () {
   var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
@@ -107,6 +110,21 @@ var formatNumber = function formatNumber(num) {
   return num.toPrecision(2);
 };
 
+function addLinks(message) {
+  message = message + '\n<a href="http://go.coindcx.com">Open App</a>\n';
+  message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">INR Alerts</a>\n';
+  message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">BTC Alerts</a>\n';
+  return message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/USDT">USDT Alerts</a>\n';
+}
+
+var getMessageToSend = function getMessageToSend(message, data, type) {
+  message = message + "------By ".concat(type, "----\n");
+  message = message + data.map(function (marketChange) {
+    return "<a href=\"".concat(marketChange.url, "\">").concat(marketChange.symbol, "</a>") + " - M ".concat(formatNumber(marketChange.changePercent), " ") + " - V ".concat(formatNumber(marketChange.changeVolumePercent), "\n");
+  }).join("");
+  return message;
+};
+
 var alert = function alert() {
   var baseCurrency = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "INR";
   return Promise.all([getMarketChanges(baseCurrency), _userService["default"].getBalances()]).then(function (values) {
@@ -123,23 +141,25 @@ var alert = function alert() {
 
       return balanceFound && marketChange.changePercent < -3.5 && marketChange.recentCandleValue * balanceFound.balance > 20;
     });
-    var filtered = marketChanges.filter(function (marketChange) {
+    var filteredByValue = marketChanges.filter(function (marketChange) {
       return marketChange.changePercent > BULL_THRESHOLD_TO_NOTIFY && marketChange.lastCandleDeviationPercent > -0.5 && checkLastMarket(marketChange, lastMarkets);
-    });
-    filtered = filtered.concat(bearInvestments);
+    }).slice(0, 3);
+    var filteredByVolume = marketChanges.filter(function (marketChange) {
+      return marketChange.changeVolumePercent > BULL_THRESHOLD_TO_NOTIFY && marketChange.lastCandleDeviationPercent > -0.5;
+    }).slice(0, 3);
+    filteredByValue = filteredByValue.concat(bearInvestments);
+    var message = "<b>Markets Now for ".concat(baseCurrency, "\n</b>");
 
-    if (filtered.length > 0) {
-      // fileService.storeLastMarket(filtered);
-      var message = "<b>Markets Now for ".concat(baseCurrency, "\n</b>");
-      message = message + "___________________\n\n";
-      message = message + filtered.map(function (marketChange) {
-        return "<a href=\"".concat(marketChange.url, "\">").concat(marketChange.symbol, "</a>") + " - M ".concat(formatNumber(marketChange.changePercent), " ") + " - V ".concat(formatNumber(marketChange.changeVolumePercent), "\n");
-      }).join("");
-      message = message + '\n<a href="http://go.coindcx.com">Open App</a>\n';
-      message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">INR Alerts</a>\n';
-      message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">BTC Alerts</a>\n';
-      message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/USDT">USDT Alerts</a>\n';
-      console.log(message);
+    if (filteredByValue.length > 0 || filteredByVolume.length > 0) {
+      if (filteredByValue.length > 0) {
+        message = getMessageToSend(message, filteredByValue, 'Value');
+      }
+
+      if (filteredByValue.length > 0) {
+        message = getMessageToSend(message, filteredByValue, 'Volume');
+      }
+
+      message = addLinks(message);
 
       _telegramService["default"].postMessage(message);
     }
