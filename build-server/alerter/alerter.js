@@ -155,14 +155,17 @@ var alert = function alert() {
 
     if (filteredByValue.length > 0 || filteredByVolume.length > 0) {
       if (filteredByValue.length > 0) {
+        console.log('Getting messages by Value');
         message = getMessageToSend(message, filteredByValue, 'Value');
       }
 
       if (filteredByValue.length > 0) {
+        console.log('Getting messages by Volume');
         message = getMessageToSend(message, filteredByVolume, 'Volume');
       }
 
       message = addLinks(message);
+      console.log(message);
 
       _telegramService["default"].postMessage(message);
     }
