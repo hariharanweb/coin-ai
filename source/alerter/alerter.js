@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import e from 'express';
 import _ from 'lodash';
 import candleService from '../services/candleService';
 import marketDetails from '../services/marketDetails';
@@ -31,10 +32,22 @@ const checkLastMarket = (marketChange, lastMarkets) => {
         return changeFromLast > 0.5 || changeFromLast < -0.5;
     } else return true;
 }
+const formatBigNum = n => {
+    if (n < 1e3) return Math.floor(n);
+    if (n >= 1e3 && n < 1e6) return +(n / 1e3).toFixed(1) + "K";
+    if (n >= 1e6 && n < 1e9) return +(n / 1e6).toFixed(1) + "M";
+    if (n >= 1e9 && n < 1e12) return +(n / 1e9).toFixed(1) + "B";
+    if (n >= 1e12) return +(n / 1e12).toFixed(1) + "T";
+};
+  
 const formatNumber = num => {
     if (num < 0) {
-        return `-(${num.toPrecision(2) * -1})`
+        return `(${num.toPrecision(2) * -1})`
+    } else if (num > 100) {
+        console.log(num)
+        return formatBigNum(num)
     }
+
     return num.toPrecision(2)
 }
 

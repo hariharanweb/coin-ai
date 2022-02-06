@@ -13,6 +13,8 @@ var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/
 
 var _dotenv = _interopRequireDefault(require("dotenv"));
 
+var _express = _interopRequireDefault(require("express"));
+
 var _lodash = _interopRequireDefault(require("lodash"));
 
 var _candleService = _interopRequireDefault(require("../services/candleService"));
@@ -104,9 +106,20 @@ var checkLastMarket = function checkLastMarket(marketChange, lastMarkets) {
   } else return true;
 };
 
+var formatBigNum = function formatBigNum(n) {
+  if (n < 1e3) return Math.floor(n);
+  if (n >= 1e3 && n < 1e6) return +(n / 1e3).toFixed(1) + "K";
+  if (n >= 1e6 && n < 1e9) return +(n / 1e6).toFixed(1) + "M";
+  if (n >= 1e9 && n < 1e12) return +(n / 1e9).toFixed(1) + "B";
+  if (n >= 1e12) return +(n / 1e12).toFixed(1) + "T";
+};
+
 var formatNumber = function formatNumber(num) {
   if (num < 0) {
-    return "-(".concat(num.toPrecision(2) * -1, ")");
+    return "(".concat(num.toPrecision(2) * -1, ")");
+  } else if (num > 100) {
+    console.log(num);
+    return formatBigNum(num);
   }
 
   return num.toPrecision(2);
