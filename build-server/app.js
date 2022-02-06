@@ -24,6 +24,10 @@ var _alertingService = _interopRequireDefault(require("./services/alertingServic
 
 var _alerter = _interopRequireDefault(require("./alerter/alerter"));
 
+var _marketDetails = _interopRequireDefault(require("./services/marketDetails"));
+
+var _lodash = _interopRequireDefault(require("lodash"));
+
 _dotenv["default"].config();
 
 var app = (0, _express["default"])();
@@ -60,26 +64,25 @@ app.get('/candle/:marketPair', /*#__PURE__*/function () {
   return function (_x, _x2) {
     return _ref.apply(this, arguments);
   };
-}()); // app.get('/user', async (req, res) => {
-//     const user = await userService.getUser();
-//     res.send(user);
-// })
-
-app.get('/user/balances', /*#__PURE__*/function () {
+}());
+app.get('/data/:marketPair', /*#__PURE__*/function () {
   var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(req, res) {
-    var balances;
+    var investingMarket, data;
     return _regenerator["default"].wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            _context2.next = 2;
-            return _userService["default"].getBalances();
+            investingMarket = _lodash["default"].find(_marketDetails["default"], {
+              pair: req.params.marketPair
+            });
+            _context2.next = 3;
+            return _candleService["default"].getMarketData(investingMarket);
 
-          case 2:
-            balances = _context2.sent;
-            res.send(balances);
+          case 3:
+            data = _context2.sent;
+            res.send(data);
 
-          case 4:
+          case 5:
           case "end":
             return _context2.stop();
         }
@@ -90,27 +93,24 @@ app.get('/user/balances', /*#__PURE__*/function () {
   return function (_x3, _x4) {
     return _ref2.apply(this, arguments);
   };
-}()); // app.post('/user/order', async (req, res) => {
-//     const body = req.body;
-//     const recentCandle = await candleService.fetchCandles(body.marketPair, 1);
-//     const lastClose = recentCandle[0].close;
-//     const order = await orderService.order(body.marketPair, lastClose, body.amount);
-//     res.send(order);
+}()); // app.get('/user', async (req, res) => {
+//     const user = await userService.getUser();
+//     res.send(user);
 // })
 
-app.post('/telegram/message', /*#__PURE__*/function () {
+app.get('/user/balances', /*#__PURE__*/function () {
   var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(req, res) {
-    var response;
+    var balances;
     return _regenerator["default"].wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
             _context3.next = 2;
-            return _telegramService["default"].postMessage(req.body.message);
+            return _userService["default"].getBalances();
 
           case 2:
-            response = _context3.sent;
-            res.send(response);
+            balances = _context3.sent;
+            res.send(balances);
 
           case 4:
           case "end":
@@ -123,21 +123,29 @@ app.post('/telegram/message', /*#__PURE__*/function () {
   return function (_x5, _x6) {
     return _ref3.apply(this, arguments);
   };
-}());
-app.get('/telegram/alert/:baseCurrency', /*#__PURE__*/function () {
+}()); // app.post('/user/order', async (req, res) => {
+//     const body = req.body;
+//     const recentCandle = await candleService.fetchCandles(body.marketPair, 1);
+//     const lastClose = recentCandle[0].close;
+//     const order = await orderService.order(body.marketPair, lastClose, body.amount);
+//     res.send(order);
+// })
+
+app.post('/telegram/message', /*#__PURE__*/function () {
   var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(req, res) {
-    var baseCurrency;
+    var response;
     return _regenerator["default"].wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
-            baseCurrency = req.params.baseCurrency || "INR";
+            _context4.next = 2;
+            return _telegramService["default"].postMessage(req.body.message);
 
-            _alerter["default"].alert(baseCurrency);
+          case 2:
+            response = _context4.sent;
+            res.send(response);
 
-            res.send("Alert Sent");
-
-          case 3:
+          case 4:
           case "end":
             return _context4.stop();
         }
@@ -147,6 +155,31 @@ app.get('/telegram/alert/:baseCurrency', /*#__PURE__*/function () {
 
   return function (_x7, _x8) {
     return _ref4.apply(this, arguments);
+  };
+}());
+app.get('/telegram/alert/:baseCurrency', /*#__PURE__*/function () {
+  var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(req, res) {
+    var baseCurrency;
+    return _regenerator["default"].wrap(function _callee5$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            baseCurrency = req.params.baseCurrency || "INR";
+
+            _alerter["default"].alert(baseCurrency);
+
+            res.send("Alert Sent");
+
+          case 3:
+          case "end":
+            return _context5.stop();
+        }
+      }
+    }, _callee5);
+  }));
+
+  return function (_x9, _x10) {
+    return _ref5.apply(this, arguments);
   };
 }());
 app.listen(port, function () {

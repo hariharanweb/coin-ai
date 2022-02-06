@@ -17,8 +17,6 @@ var _lodash = _interopRequireDefault(require("lodash"));
 
 var _candleService = _interopRequireDefault(require("../services/candleService"));
 
-var _fileService = _interopRequireDefault(require("../services/fileService"));
-
 var _marketDetails = _interopRequireDefault(require("../services/marketDetails"));
 
 var _telegramService = _interopRequireDefault(require("../services/telegramService"));
@@ -45,47 +43,17 @@ var getMarketChanges = /*#__PURE__*/function () {
             });
             responses = investingMarkets.map( /*#__PURE__*/function () {
               var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(investingMarket) {
-                var candles, meanByParameter, tenPercent, recentCandles, oldCandles, recentMean, oldMean, changePercent, recentCandleValue, lastCandleDeviationPercent;
                 return _regenerator["default"].wrap(function _callee$(_context) {
                   while (1) {
                     switch (_context.prev = _context.next) {
                       case 0:
                         _context.next = 2;
-                        return _candleService["default"].fetchCandles(investingMarket.pair);
+                        return _candleService["default"].getMarketData(investingMarket);
 
                       case 2:
-                        candles = _context.sent;
+                        return _context.abrupt("return", _context.sent);
 
-                        if (!(candles.length === 0)) {
-                          _context.next = 5;
-                          break;
-                        }
-
-                        return _context.abrupt("return", null);
-
-                      case 5:
-                        meanByParameter = 'close';
-                        tenPercent = Math.round(candles.length * 0.1);
-                        recentCandles = candles.slice(0, tenPercent);
-                        oldCandles = candles.slice(tenPercent);
-                        recentMean = _lodash["default"].meanBy(recentCandles, meanByParameter);
-                        oldMean = _lodash["default"].meanBy(oldCandles, meanByParameter);
-                        changePercent = (recentMean - oldMean) * 100 / oldMean;
-                        recentCandleValue = candles[0][meanByParameter];
-                        lastCandleDeviationPercent = (recentCandleValue - recentMean) * 100 / recentMean;
-                        return _context.abrupt("return", {
-                          marketPair: investingMarket.pair,
-                          symbol: investingMarket.symbol,
-                          recentMean: recentMean,
-                          oldMean: oldMean,
-                          changePercent: changePercent,
-                          recentCandleValue: recentCandleValue,
-                          lastCandleDeviationPercent: lastCandleDeviationPercent,
-                          currency: investingMarket.target_currency_short_name,
-                          url: "https://coindcx.com/trade/".concat(investingMarket.symbol)
-                        });
-
-                      case 15:
+                      case 3:
                       case "end":
                         return _context.stop();
                     }

@@ -25,20 +25,27 @@ const getMarketData = async investingMarket => {
     const candles = await fetchCandles(investingMarket.pair);
     if (candles.length === 0) return null;
     const meanByParameter = 'close';
+    const volume = 'volume';
     const tenPercent = Math.round(candles.length * 0.1);
-    const recentCandles = candles.slice(0, tenPercent);
-    const oldCandles = candles.slice(tenPercent);
-    const recentMean = _.meanBy(recentCandles, meanByParameter);
-    const oldMean = _.meanBy(oldCandles, meanByParameter);
-    const changePercent = (recentMean - oldMean) * 100 / oldMean;
+    const recent = candles.slice(0, tenPercent);
+    const old = candles.slice(tenPercent);
+    const recentValueMean = _.meanBy(recent, meanByParameter);
+    const recentVolumeMean = _.meanBy(recent, volume);
+    const oldValueMean = _.meanBy(old, meanByParameter);
+    const oldVolumeMean = _.meanBy(old, volume);
+    const changeValuePercent = (recentValueMean - oldValueMean) * 100 / oldValueMean;
+    const changeVolumePercent = (recentVolumeMean - oldVolumeMean) * 100 / oldVolumeMean;
     const recentCandleValue = candles[0][meanByParameter];
-    const lastCandleDeviationPercent = (recentCandleValue - recentMean) * 100 / recentMean;
+    const recentCandleVolume = candles[0][volume];
+    const lastCandleDeviationPercent = (recentCandleValue - recentValueMean) * 100 / recentValueMean;
     return {
         marketPair: investingMarket.pair,
         symbol: investingMarket.symbol,
-        recentMean,
-        oldMean,
-        changePercent,
+        recentMean: recentValueMean,
+        oldMean: oldValueMean,
+        changePercent: changeValuePercent,
+        changeVolumePercent,
+        recentCandleVolume,
         recentCandleValue,
         lastCandleDeviationPercent,
         currency: investingMarket.target_currency_short_name,

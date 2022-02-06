@@ -28,7 +28,6 @@ app.get('/candle/:marketPair', async (req, res) => {
 app.get('/data/:marketPair', async (req, res) => {
     const investingMarket = _.find(marketDetails, {pair: req.params.marketPair})
     const data = await candleService.getMarketData(investingMarket);
-    console.log('fata',data)
     res.send(data);
 })
 
