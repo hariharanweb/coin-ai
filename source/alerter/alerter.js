@@ -8,7 +8,7 @@ import userService from '../services/userService';
 
 dotenv.config();
 const BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
-const BULL_VOLUME_THRESHOLD_TO_NOTIFY = process.env.BULL_VOLUME_THRESHOLD_TO_NOTIFY ?? 10;
+const BULL_VOLUME_THRESHOLD_TO_NOTIFY = process.env.BULL_VOLUME_THRESHOLD_TO_NOTIFY ?? 20;
 const DOLLAR = "\u{1F4B0}"
 const BOX = "\u{1F4E6}"
 
@@ -99,7 +99,7 @@ const alert = (baseCurrency = "INR") => Promise.all([getMarketChanges(baseCurren
             console.log('Getting messages by Value')
             message = getMessageToSend(message, filteredByValue, 'Value');
         }
-        if (filteredByValue.length > 0) {
+        if (filteredByVolume.length > 0) {
             console.log('Getting messages by Volume')
             message = getMessageToSend(message, filteredByVolume, 'Volume');
         }

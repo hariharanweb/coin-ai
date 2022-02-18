@@ -30,7 +30,7 @@ var _process$env$BULL_VOL;
 _dotenv["default"].config();
 
 var BULL_THRESHOLD_TO_NOTIFY = process.env.BULL_THRESHOLD_TO_NOTIFY;
-var BULL_VOLUME_THRESHOLD_TO_NOTIFY = (_process$env$BULL_VOL = process.env.BULL_VOLUME_THRESHOLD_TO_NOTIFY) !== null && _process$env$BULL_VOL !== void 0 ? _process$env$BULL_VOL : 10;
+var BULL_VOLUME_THRESHOLD_TO_NOTIFY = (_process$env$BULL_VOL = process.env.BULL_VOLUME_THRESHOLD_TO_NOTIFY) !== null && _process$env$BULL_VOL !== void 0 ? _process$env$BULL_VOL : 20;
 var DOLLAR = "\uD83D\uDCB0";
 var BOX = "\uD83D\uDCE6";
 
@@ -174,7 +174,7 @@ var alert = function alert() {
         message = getMessageToSend(message, filteredByValue, 'Value');
       }
 
-      if (filteredByValue.length > 0) {
+      if (filteredByVolume.length > 0) {
         console.log('Getting messages by Volume');
         message = getMessageToSend(message, filteredByVolume, 'Volume');
       }
