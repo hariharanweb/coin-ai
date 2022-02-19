@@ -31,6 +31,11 @@ app.get('/data/:marketPair', async (req, res) => {
     res.send(data);
 })
 
+app.get('/marketData/:currency', async (req, res) => {
+    const data = await alerter.getMarketChanges(req.params.currency)
+    res.send(data);
+})
+
 // app.get('/user', async (req, res) => {
 //     const user = await userService.getUser();
 //     res.send(user);

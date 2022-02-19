@@ -188,6 +188,7 @@ var alert = function alert() {
 };
 
 var _default = {
-  alert: alert
+  alert: alert,
+  getMarketChanges: getMarketChanges
 };
 exports["default"] = _default;

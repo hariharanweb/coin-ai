@@ -110,6 +110,7 @@ const alert = (baseCurrency = "INR") => Promise.all([getMarketChanges(baseCurren
 });
 
 export default {
-    alert
+    alert,
+    getMarketChanges
 }
 
