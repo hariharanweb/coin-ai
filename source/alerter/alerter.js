@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import e from 'express';
 import _ from 'lodash';
 import candleService from '../services/candleService';
 import marketDetails from '../services/marketDetails';
@@ -53,8 +52,6 @@ const formatNumber = num => {
 
 function addLinks(message) {
     message = message + '\n<a href="http://go.coindcx.com">Open App</a>'
-    message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/INR">Send <b>INR Alerts</b></a>'
-    message = message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/BTC">Send <b>BTC Alerts</b></a>'
     return message + '\n<a href="https://coin-alertor.herokuapp.com/telegram/alert/USDT">Send <b>USDT Alerts</b></a>'
 }
 
