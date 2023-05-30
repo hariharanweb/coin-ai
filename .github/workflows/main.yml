@@ -23,8 +23,8 @@ jobs:
         env:
           CI: true
         run: |
-          npm ci
+          npm build
       - name: deploy
         run: |
-          zip -r deploy.zip .
+          zip -r deploy.zip dist-server
           aws lambda update-function-code --function-name=coin-ai-bot --zip-file=fileb://deploy.zip
