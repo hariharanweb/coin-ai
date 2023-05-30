@@ -1,4 +1,4 @@
-import alerter from './source/alerter/alerter';
+import alerter from './alerter/alerter';
 
 export const handler = async () => {
   const data = await alerter.alert('USDT')
